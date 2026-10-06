@@ -10,7 +10,9 @@ const REQUIRED_TEXT_FIELDS = [
   "email",
   "whatsapp",
   "tiktok",
+  "tiktokFollowers",
   "instagram",
+  "instagramFollowers",
   "motivation",
 ] as const;
 
@@ -88,6 +90,13 @@ function validateTextPayload(payload: RegistrationPayload): string | null {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(payload.email)) {
     return "Email format is invalid.";
+  }
+
+  for (const field of ["tiktokFollowers", "instagramFollowers"] as const) {
+    const followerCount = Number(payload[field]);
+    if (!Number.isSafeInteger(followerCount) || followerCount < 0) {
+      return `Field '${field}' must be a non-negative whole number.`;
+    }
   }
 
   return null;
@@ -207,17 +216,59 @@ async function uploadFilesToDrive(
   return results;
 }
 
+let cachedSheetName: string | null = null;
+
+// Match the configured tab name against the spreadsheet's actual tabs so a
+// mismatched env value (e.g. "Sheet1" vs "Sheet 1") doesn't break submissions.
+async function resolveSheetName(
+  sheets: SheetsClient,
+  spreadsheetId: string,
+): Promise<string> {
+  if (cachedSheetName) return cachedSheetName;
+
+  const configured = (process.env.GOOGLE_SHEETS_SHEET_NAME || "")
+    .trim()
+    .replace(/^['"]|['"]$/g, "");
+
+  const { data } = await sheets.spreadsheets.get({
+    spreadsheetId,
+    fields: "sheets.properties.title",
+  });
+  const titles = (data.sheets ?? [])
+    .map((sheet) => sheet.properties?.title)
+    .filter((title): title is string => Boolean(title));
+
+  if (titles.length === 0) {
+    throw new Error("Spreadsheet has no tabs");
+  }
+
+  const normalize = (value: string) => value.replace(/\s+/g, "").toLowerCase();
+  const match =
+    titles.find((title) => title === configured) ??
+    titles.find((title) => normalize(title) === normalize(configured));
+
+  if (!match && configured) {
+    console.warn(
+      `[register] Sheet tab "${configured}" not found (tabs: ${titles.join(", ")}); using "${titles[0]}"`,
+    );
+  }
+
+  const resolved: string = match ?? titles[0];
+  cachedSheetName = resolved;
+  return resolved;
+}
+
 async function appendToSheet(
   sheets: SheetsClient,
   payload: RegistrationPayload,
   proofUrls: string[],
 ) {
   const spreadsheetId = getEnv("GOOGLE_SHEETS_SPREADSHEET_ID");
-  const sheetName = process.env.GOOGLE_SHEETS_SHEET_NAME || "Registrations";
+  const sheetName = await resolveSheetName(sheets, spreadsheetId);
 
   await sheets.spreadsheets.values.append({
     spreadsheetId,
-    range: `${sheetName}!A:I`,
+    range: `'${sheetName.replace(/'/g, "''")}'!A:K`,
     valueInputOption: "USER_ENTERED",
     insertDataOption: "INSERT_ROWS",
     requestBody: {
@@ -229,7 +280,9 @@ async function appendToSheet(
           payload.email,
           payload.whatsapp,
           payload.tiktok,
+          payload.tiktokFollowers,
           payload.instagram,
+          payload.instagramFollowers,
           payload.motivation,
           proofUrls.join("\n"),
         ],

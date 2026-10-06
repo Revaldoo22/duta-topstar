@@ -60,9 +60,14 @@ Create columns in this order:
 4. `email`
 5. `whatsapp`
 6. `tiktok`
-7. `instagram`
-8. `motivation`
-9. `proof_urls`
+7. `tiktok_followers`
+8. `instagram`
+9. `instagram_followers`
+10. `motivation`
+11. `proof_urls`
+
+Add the two follower columns to the spreadsheet in this order before receiving
+registrations with the updated form.
 
 API endpoint used by frontend: `POST /api/register`.
 

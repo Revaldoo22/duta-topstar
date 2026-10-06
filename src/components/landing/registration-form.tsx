@@ -207,8 +207,20 @@ export function RegistrationForm({ locale, formContent }: RegistrationFormProps)
       icon: Music2,
     },
     {
-      id: "instagram",
+      id: "tiktokFollowers",
       number: "6",
+      label: locale === "id" ? "Jumlah Followers TikTok" : "TikTok Follower Count",
+      helper:
+        locale === "id"
+          ? "Masukkan jumlah followers pada akun TikTok kamu."
+          : "Enter the number of followers on your TikTok account.",
+      placeholder: locale === "id" ? "Contoh: 1500" : "Example: 1500",
+      type: "number",
+      icon: Users,
+    },
+    {
+      id: "instagram",
+      number: "7",
       label: locale === "id" ? "Akun Instagram" : "Instagram Account",
       helper:
         locale === "id"
@@ -219,6 +231,18 @@ export function RegistrationForm({ locale, formContent }: RegistrationFormProps)
           ? "@username / https://instagram.com/..."
           : "@username / https://instagram.com/...",
       type: "text",
+      icon: Users,
+    },
+    {
+      id: "instagramFollowers",
+      number: "8",
+      label: locale === "id" ? "Jumlah Followers Instagram" : "Instagram Follower Count",
+      helper:
+        locale === "id"
+          ? "Masukkan jumlah followers pada akun Instagram kamu."
+          : "Enter the number of followers on your Instagram account.",
+      placeholder: locale === "id" ? "Contoh: 1200" : "Example: 1200",
+      type: "number",
       icon: Users,
     },
   ] as const;
@@ -423,7 +447,7 @@ export function RegistrationForm({ locale, formContent }: RegistrationFormProps)
 
                 <div className="mt-4 grid gap-2 sm:grid-cols-3">
                   <div className="rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-center dark:border-slate-700/80 dark:bg-slate-900/70">
-                    <p className="text-xl font-extrabold text-slate-900 dark:text-slate-100">8</p>
+                    <p className="text-xl font-extrabold text-slate-900 dark:text-slate-100">10</p>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-600 dark:text-slate-300">
                       {locale === "id" ? "Field Wajib" : "Required Fields"}
                     </p>
@@ -470,6 +494,8 @@ export function RegistrationForm({ locale, formContent }: RegistrationFormProps)
                           name={field.id}
                           type={field.type}
                           placeholder={field.placeholder}
+                          min={field.type === "number" ? 0 : undefined}
+                          step={field.type === "number" ? 1 : undefined}
                           className="mt-2 h-11 border-slate-200 bg-slate-50/70 text-sm dark:border-slate-600 dark:bg-slate-800/60"
                           required
                         />
@@ -484,7 +510,7 @@ export function RegistrationForm({ locale, formContent }: RegistrationFormProps)
                     className="text-sm font-semibold text-slate-900 dark:text-slate-100"
                   >
                     <span className="inline-flex size-5 items-center justify-center rounded-full bg-rose-600 text-[11px] font-bold text-white">
-                      7
+                      9
                     </span>
                     Bukti Follow Instagram & TikTok Universitas STEKOM + TopLoker.com
                     <ImageUp className="ml-auto size-4 text-rose-600 dark:text-rose-300" />
@@ -628,7 +654,7 @@ export function RegistrationForm({ locale, formContent }: RegistrationFormProps)
                     className="text-sm font-semibold text-slate-900 dark:text-slate-100"
                   >
                     <span className="inline-flex size-5 items-center justify-center rounded-full bg-slate-900 text-[11px] font-bold text-white dark:bg-slate-200 dark:text-slate-900">
-                      8
+                      10
                     </span>
                     Motivasi Bergabung
                   </Label>
