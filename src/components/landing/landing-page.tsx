@@ -37,7 +37,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 export function LandingPage() {
   const locale: Locale = "id";
   const whatsappNumber = "628888555591";
-  const whatsappDisplay = "+62 888-8555-591";
+  const whatsappDisplay = "+62 8888-5555-91";
   const whatsappLink = `https://wa.me/${whatsappNumber}`;
 
   return (
